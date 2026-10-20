@@ -1,0 +1,357 @@
+<Application x:Class="xPlayer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:xPlayer"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <FontFamily x:Key="Display">pack://application:,,,/Fonts/#Creepster</FontFamily>
+            <FontFamily x:Key="Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+            <SolidColorBrush x:Key="Night" Color="#0B0612"/>
+            <SolidColorBrush x:Key="Crypt" Color="#150C21"/>
+            <SolidColorBrush x:Key="Crypt2" Color="#1F1230"/>
+            <SolidColorBrush x:Key="Crypt3" Color="#2B1A40"/>
+            <SolidColorBrush x:Key="Edge" Color="#3A2552"/>
+            <SolidColorBrush x:Key="Pumpkin" Color="#FF7A18"/>
+            <SolidColorBrush x:Key="PumpkinDeep" Color="#C24E00"/>
+            <SolidColorBrush x:Key="Witch" Color="#8B3DFF"/>
+            <SolidColorBrush x:Key="Slime" Color="#7CFF4F"/>
+            <SolidColorBrush x:Key="Blood" Color="#FF2E4D"/>
+            <SolidColorBrush x:Key="Bone" Color="#F2E8D5"/>
+            <SolidColorBrush x:Key="Moon" Color="#FFD54A"/>
+            <SolidColorBrush x:Key="Mist" Color="#9A8BB0"/>
+            <SolidColorBrush x:Key="Fog" Color="#5E4F75"/>
+            <Color x:Key="PumpkinColor">#FF7A18</Color>
+            <LinearGradientBrush x:Key="PumpkinGrad" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFA23A" Offset="0"/><GradientStop Color="#FF7A18" Offset="0.55"/><GradientStop Color="#C24E00" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="WindowGrad" StartPoint="0,0" EndPoint="0.4,1">
+                <GradientStop Color="#0B0612" Offset="0"/><GradientStop Color="#150C21" Offset="0.6"/><GradientStop Color="#1A0F2B" Offset="1"/>
+            </LinearGradientBrush>
+
+            <!-- ============ buttons ============ -->
+            <Style x:Key="Btn" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource Bone}"/>
+                <Setter Property="Background" Value="{StaticResource Crypt2}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Edge}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="14,7"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Pumpkin}"/>
+                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource Crypt3}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource Edge}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.4"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="IconBtn" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource Bone}"/>
+                <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+                <Setter Property="FontSize" Value="17"/>
+                <Setter Property="Width" Value="40"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="Transparent" CornerRadius="20">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="{StaticResource Crypt3}"/></Trigger>
+                                <Trigger Property="IsPressed" Value="True"><Setter TargetName="bd" Property="Background" Value="{StaticResource Edge}"/></Trigger>
+                                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.35"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ToggleIcon" TargetType="ToggleButton">
+                <Setter Property="Foreground" Value="{StaticResource Mist}"/>
+                <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+                <Setter Property="FontSize" Value="17"/>
+                <Setter Property="Width" Value="40"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border x:Name="bd" Background="Transparent" CornerRadius="20">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="{StaticResource Crypt3}"/></Trigger>
+                                <Trigger Property="IsChecked" Value="True"><Setter Property="Foreground" Value="{StaticResource Pumpkin}"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="PlayBtn" TargetType="Button">
+                <Setter Property="Width" Value="58"/>
+                <Setter Property="Height" Value="58"/>
+                <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="Foreground" Value="{StaticResource Night}"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Ellipse x:Name="glow" Fill="{StaticResource PumpkinGrad}" Opacity="0.95">
+                                    <Ellipse.Effect><DropShadowEffect Color="#FF7A18" BlurRadius="22" ShadowDepth="0" Opacity="0.55"/></Ellipse.Effect>
+                                </Ellipse>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="glow" Property="Opacity" Value="1"/></Trigger>
+                                <Trigger Property="IsPressed" Value="True"><Setter TargetName="glow" Property="Opacity" Value="0.8"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ============ slider ============ -->
+            <Style x:Key="SliderFill" TargetType="RepeatButton">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RepeatButton">
+                            <Border Height="5" CornerRadius="3" Background="{StaticResource PumpkinGrad}" VerticalAlignment="Center"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="SliderEmpty" TargetType="RepeatButton">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent" Height="22"/></ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="SliderThumb" TargetType="Thumb">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Thumb">
+                            <Ellipse x:Name="e" Width="14" Height="14" Fill="{StaticResource Bone}" Stroke="{StaticResource Pumpkin}" StrokeThickness="2" RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform><ScaleTransform ScaleX="0.85" ScaleY="0.85"/></Ellipse.RenderTransform>
+                            </Ellipse>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="e" Property="RenderTransform"><Setter.Value><ScaleTransform ScaleX="1.2" ScaleY="1.2"/></Setter.Value></Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="Seek" TargetType="Slider">
+                <Setter Property="IsMoveToPointEnabled" Value="True"/>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Slider">
+                            <Grid Height="22" Background="Transparent">
+                                <Border Height="5" CornerRadius="3" Background="{StaticResource Crypt3}" VerticalAlignment="Center"/>
+                                <Track x:Name="PART_Track">
+                                    <Track.DecreaseRepeatButton><RepeatButton Style="{StaticResource SliderFill}" Command="Slider.DecreaseLarge"/></Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton><RepeatButton Style="{StaticResource SliderEmpty}" Command="Slider.IncreaseLarge"/></Track.IncreaseRepeatButton>
+                                    <Track.Thumb><Thumb Style="{StaticResource SliderThumb}"/></Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ============ scrollbar ============ -->
+            <Style TargetType="ScrollBar">
+                <Setter Property="Width" Value="9"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ScrollBar">
+                            <Grid Background="Transparent">
+                                <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                    <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsTabStop="False"/></Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsTabStop="False"/></Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb>
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border x:Name="t" Background="{StaticResource Edge}" CornerRadius="4" Margin="2,0"/>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="t" Property="Background" Value="{StaticResource Pumpkin}"/></Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ============ list items ============ -->
+            <Style x:Key="RowItem" TargetType="ListBoxItem">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8" Margin="4,1">
+                                <Grid>
+                                    <Border x:Name="bar" Width="3" CornerRadius="2" Background="{StaticResource Pumpkin}" HorizontalAlignment="Left" Margin="2,8" Visibility="Collapsed"/>
+                                    <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="#241638"/></Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#33204F"/>
+                                    <Setter TargetName="bar" Property="Visibility" Value="Visible"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="PlainList" TargetType="ListBox">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="ItemContainerStyle" Value="{StaticResource RowItem}"/>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+                <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+                <Setter Property="SelectionMode" Value="Extended"/>
+            </Style>
+
+            <!-- ============ inputs, tabs, menus ============ -->
+            <Style x:Key="Input" TargetType="TextBox">
+                <Setter Property="Foreground" Value="{StaticResource Bone}"/>
+                <Setter Property="CaretBrush" Value="{StaticResource Pumpkin}"/>
+                <Setter Property="SelectionBrush" Value="{StaticResource Witch}"/>
+                <Setter Property="Background" Value="{StaticResource Crypt2}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Edge}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="10,7"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                                <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Pumpkin}"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="Tab" TargetType="RadioButton">
+                <Setter Property="Foreground" Value="{StaticResource Mist}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="bd" CornerRadius="9" Padding="14,7" Background="Transparent">
+                                <ContentPresenter HorizontalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{StaticResource Bone}"/></Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource Crypt3}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource Pumpkin}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="ToolTip">
+                <Setter Property="Background" Value="{StaticResource Crypt2}"/>
+                <Setter Property="Foreground" Value="{StaticResource Bone}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Edge}"/>
+                <Setter Property="Padding" Value="8,5"/>
+            </Style>
+            <Style TargetType="ContextMenu">
+                <Setter Property="Background" Value="{StaticResource Crypt2}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Edge}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="4"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                                <Border.Effect><DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.6"/></Border.Effect>
+                                <StackPanel IsItemsHost="True"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="MenuItem">
+                <Setter Property="Foreground" Value="{StaticResource Bone}"/>
+                <Setter Property="Padding" Value="12,7"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="MenuItem">
+                            <Border x:Name="bd" Background="Transparent" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="bd" Property="Background" Value="{StaticResource Crypt3}"/></Trigger>
+                                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.4"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="Separator">
+                <Setter Property="Margin" Value="6,3"/>
+                <Setter Property="Template">
+                    <Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Background="{StaticResource Edge}"/></ControlTemplate></Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="CheckBox">
+                <Setter Property="Foreground" Value="{StaticResource Bone}"/>
+                <Setter Property="Margin" Value="0,4"/>
+            </Style>
+            <Style TargetType="ComboBox">
+                <Setter Property="Padding" Value="8,5"/>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

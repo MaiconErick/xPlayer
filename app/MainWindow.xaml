@@ -1,0 +1,345 @@
+<Window x:Class="xPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:xPlayer"
+        Title="xPlayer" Width="1500" Height="900" MinWidth="980" MinHeight="620"
+        Background="{StaticResource WindowGrad}" AllowDrop="True" UseLayoutRounding="True" SnapsToDevicePixels="True"
+        FontFamily="Segoe UI" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="ClearType"
+        Foreground="{StaticResource Bone}">
+
+    <Window.Resources>
+        <DataTemplate x:Key="TrackRow" DataType="{x:Type local:Track}">
+            <Grid Height="46" Background="Transparent">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center" Margin="14,0,6,0">
+                    <TextBlock Text="{Binding Title}" Foreground="{StaticResource Bone}" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Foreground="{StaticResource Mist}" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,1,0,0">
+                        <Run Text="{Binding Artist, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Album, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding Time}" Foreground="{StaticResource Fog}" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="QueueRow" DataType="{x:Type local:QueueItem}">
+            <Grid Height="46" Background="Transparent">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock x:Name="mark" Text="&#xE768;" FontFamily="{StaticResource Icons}" FontSize="12" Foreground="{StaticResource Pumpkin}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="2,0,6,0">
+                    <TextBlock x:Name="title" Text="{Binding Track.Title}" Foreground="{StaticResource Bone}" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Foreground="{StaticResource Mist}" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,1,0,0">
+                        <Run Text="{Binding Track.Artist, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Track.Album, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+                <TextBlock Grid.Column="2" Text="{Binding Track.Time}" Foreground="{StaticResource Fog}" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                    <Setter TargetName="mark" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="title" Property="Foreground" Value="{StaticResource Pumpkin}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Failed}" Value="True">
+                    <Setter TargetName="title" Property="Foreground" Value="{StaticResource Blood}"/>
+                    <Setter TargetName="title" Property="TextDecorations" Value="Strikethrough"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ScrobbleRow" DataType="{x:Type local:ScrobbleVm}">
+            <Grid Height="50" Background="Transparent" ToolTip="{Binding StatusText}">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="34"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Glyph}" Foreground="{Binding Brush}" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,6,0">
+                    <TextBlock Text="{Binding Title}" Foreground="{StaticResource Bone}" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Sub}" Foreground="{StaticResource Mist}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock Text="{Binding When}" Foreground="{StaticResource Fog}" FontSize="12" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding Plays}" Foreground="{StaticResource Mist}" FontSize="11" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="LyricRow" DataType="{x:Type local:LyricLineVm}">
+            <StackPanel Margin="0,6" Background="Transparent" Cursor="Hand" Tag="{Binding}" MouseLeftButtonUp="LyricLine_Click">
+                <TextBlock Text="{Binding Text}" Foreground="{Binding Brush}" FontSize="{Binding FontSize}" FontWeight="{Binding Weight}"
+                           Opacity="{Binding Opacity}" TextWrapping="Wrap" TextAlignment="Center"/>
+                <TextBlock Text="{Binding Translation}" Foreground="{StaticResource Mist}" FontSize="14" Opacity="{Binding Opacity}"
+                           TextWrapping="Wrap" TextAlignment="Center" Margin="0,2,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers><DataTrigger Binding="{Binding HasTranslation}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+        </DataTemplate>
+
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="#CC150C21"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Edge}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="18"/>
+        </Style>
+        <Style x:Key="Splitter" TargetType="GridSplitter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="{StaticResource WindowGrad}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- header -->
+        <Grid Grid.Row="0" Margin="18,10,14,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <local:Sprite Id="pumpkin" Height="30" Margin="0,0,10,0"/>
+                <TextBlock Text="xPlayer" FontFamily="{StaticResource Display}" FontSize="30" Foreground="{StaticResource Pumpkin}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <TextBlock x:Name="ScanText" Grid.Column="1" Foreground="{StaticResource Fog}" FontSize="12" VerticalAlignment="Center" Margin="18,4,0,0"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <ToggleButton x:Name="TbLeft" Style="{StaticResource ToggleIcon}" Content="&#xE8F1;" ToolTip="Library, queue and scrobbles" IsChecked="True" Click="TogglePanels_Click"/>
+                <ToggleButton x:Name="TbLyrics" Style="{StaticResource ToggleIcon}" Content="&#xE8BD;" ToolTip="Lyrics panel" IsChecked="True" Click="TogglePanels_Click"/>
+                <Button Style="{StaticResource IconBtn}" Content="&#xE713;" ToolTip="Settings" Click="Settings_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- panels -->
+        <Grid Grid.Row="1" Margin="14,4,14,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="ColLeft" Width="420" MinWidth="260"/>
+                <ColumnDefinition x:Name="ColSplit1" Width="8"/>
+                <ColumnDefinition Width="*" MinWidth="320"/>
+                <ColumnDefinition x:Name="ColSplit2" Width="8"/>
+                <ColumnDefinition x:Name="ColLyrics" Width="440" MinWidth="280"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- left: library / queue / scrobbles -->
+            <Border x:Name="LeftCard" Style="{StaticResource Card}">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Margin="4,2,4,8">
+                        <RadioButton x:Name="TabLibrary" Style="{StaticResource Tab}" Content="Library" IsChecked="True" Checked="Tab_Checked"/>
+                        <RadioButton x:Name="TabQueue" Style="{StaticResource Tab}" Content="Queue" Checked="Tab_Checked" Margin="4,0,0,0"/>
+                        <RadioButton x:Name="TabScrobbles" Style="{StaticResource Tab}" Content="Scrobbles" Checked="Tab_Checked" Margin="4,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- library -->
+                    <Grid x:Name="ViewLibrary" Grid.Row="1">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                        <Grid Margin="4,0,4,0">
+                            <TextBox x:Name="SearchBox" Style="{StaticResource Input}" TextChanged="Search_Changed"/>
+                            <TextBlock x:Name="SearchHint" Text="Search artist, title or album…" Foreground="{StaticResource Fog}" IsHitTestVisible="False"
+                                       VerticalAlignment="Center" Margin="12,0,0,0" FontSize="13"/>
+                        </Grid>
+                        <TextBlock x:Name="LibraryInfo" Grid.Row="1" Foreground="{StaticResource Fog}" FontSize="11" Margin="10,6,0,4"/>
+                        <ListBox x:Name="LibraryList" Grid.Row="2" Style="{StaticResource PlainList}" ItemTemplate="{StaticResource TrackRow}"
+                                 MouseDoubleClick="Library_DoubleClick" PreviewMouseLeftButtonDown="List_PreviewMouseDown" PreviewMouseMove="Library_PreviewMouseMove"
+                                 KeyDown="Library_KeyDown" ContextMenuOpening="Library_ContextMenuOpening">
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Play" Click="LibPlay_Click"/>
+                                    <MenuItem Header="Play next" Click="LibPlayNext_Click"/>
+                                    <MenuItem Header="Add to queue" Click="LibAdd_Click"/>
+                                    <Separator/>
+                                    <MenuItem Header="Play whole album" Click="LibAlbum_Click"/>
+                                    <MenuItem Header="Show in Explorer" Click="LibExplorer_Click"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                    </Grid>
+
+                    <!-- queue -->
+                    <Grid x:Name="ViewQueue" Grid.Row="1" Visibility="Collapsed">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                        <Grid Margin="10,0,6,6">
+                            <TextBlock x:Name="QueueInfo" Foreground="{StaticResource Mist}" FontSize="12" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource Btn}" Content="Show playing" Padding="10,4" FontSize="12" Click="QueueLocate_Click"/>
+                                <Button Style="{StaticResource Btn}" Content="Clear" Padding="10,4" FontSize="12" Margin="6,0,0,0" Click="QueueClear_Click"/>
+                            </StackPanel>
+                        </Grid>
+                        <ListBox x:Name="QueueList" Grid.Row="1" Style="{StaticResource PlainList}" ItemTemplate="{StaticResource QueueRow}" AllowDrop="True"
+                                 MouseDoubleClick="Queue_DoubleClick" PreviewMouseLeftButtonDown="List_PreviewMouseDown" PreviewMouseMove="Queue_PreviewMouseMove"
+                                 DragOver="Queue_DragOver" Drop="Queue_Drop" KeyDown="Queue_KeyDown">
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Play" Click="QueuePlay_Click"/>
+                                    <MenuItem Header="Remove" Click="QueueRemove_Click"/>
+                                    <MenuItem Header="Show in Explorer" Click="QueueExplorer_Click"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                        <StackPanel x:Name="QueueEmpty" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
+                            <local:Sprite Id="ghost" Height="64" HorizontalAlignment="Center"/>
+                            <TextBlock Text="The queue is empty" Foreground="{StaticResource Mist}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,2"/>
+                            <TextBlock Text="Drop files or folders anywhere" Foreground="{StaticResource Fog}" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- scrobbles -->
+                    <Grid x:Name="ViewScrobbles" Grid.Row="1" Visibility="Collapsed">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                        <StackPanel Margin="10,0,6,8">
+                            <TextBlock x:Name="ScrobbleAccount" Foreground="{StaticResource Mist}" FontSize="12" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="ScrobbleStats" Foreground="{StaticResource Bone}" FontSize="13" TextWrapping="Wrap" Margin="0,8,0,8"/>
+                            <Button Style="{StaticResource Btn}" Content="Retry problems" Padding="10,4" FontSize="12" HorizontalAlignment="Left" Click="ScrobbleRetry_Click"/>
+                        </StackPanel>
+                        <ListBox x:Name="ScrobbleList" Grid.Row="1" Style="{StaticResource PlainList}" ItemTemplate="{StaticResource ScrobbleRow}">
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Send again" Click="ScrobbleSend_Click"/>
+                                    <MenuItem Header="Verify again" Click="ScrobbleVerify_Click"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Column="1" x:Name="Split1" Style="{StaticResource Splitter}" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
+
+            <!-- center: now playing -->
+            <Border x:Name="CenterCard" Grid.Column="2" Style="{StaticResource Card}" ClipToBounds="True" AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver">
+                <Grid>
+                    <local:AmbientLayer x:Name="Ambient" Kind="wisps" IsHitTestVisible="False" Scale="1.2" Reach="0.9"/>
+                    <Grid Margin="28,22,28,22">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <TextBlock Text="NOW PLAYING" FontFamily="{StaticResource Display}" FontSize="20" Foreground="{StaticResource Witch}" HorizontalAlignment="Center"/>
+
+                        <Grid x:Name="CoverHost" Grid.Row="1" Margin="0,14" SizeChanged="CoverHost_SizeChanged">
+                            <Border x:Name="CoverBox" Width="400" Height="400" CornerRadius="22" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Background="{StaticResource Crypt2}" BorderBrush="{StaticResource Edge}" BorderThickness="1">
+                                <Border.Effect><DropShadowEffect Color="#FF7A18" BlurRadius="46" ShadowDepth="0" Opacity="0.32"/></Border.Effect>
+                                <Grid>
+                                    <local:Sprite x:Name="CoverFallback" Id="skull" Height="120" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.55"/>
+                                    <Border x:Name="CoverImage" CornerRadius="21"/>
+                                    <Canvas x:Name="SpookLayer" IsHitTestVisible="False" ClipToBounds="True"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <StackPanel Grid.Row="2" HorizontalAlignment="Center" MaxWidth="640">
+                            <TextBlock x:Name="NpTitle" Text="Nothing playing" Foreground="{StaticResource Bone}" FontSize="28" FontWeight="SemiBold"
+                                       TextAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                            <TextBlock x:Name="NpArtist" Foreground="{StaticResource Pumpkin}" FontSize="19" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                            <TextBlock x:Name="NpAlbum" Foreground="{StaticResource Mist}" FontSize="14" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,0">
+                                <Border Background="{StaticResource Crypt2}" BorderBrush="{StaticResource Edge}" BorderThickness="1" CornerRadius="12" Padding="10,4">
+                                    <TextBlock x:Name="NpTech" Foreground="{StaticResource Mist}" FontSize="12"/>
+                                </Border>
+                                <Border x:Name="ScrobbleBadge" Background="{StaticResource Crypt2}" BorderBrush="{StaticResource Edge}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="8,0,0,0">
+                                    <TextBlock x:Name="ScrobbleBadgeText" Foreground="{StaticResource Mist}" FontSize="12"/>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Column="3" x:Name="Split2" Style="{StaticResource Splitter}" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
+
+            <!-- right: lyrics -->
+            <Border x:Name="LyricsCard" Grid.Column="4" Style="{StaticResource Card}" ClipToBounds="True">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <Grid Margin="18,12,10,4">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="LYRICS" FontFamily="{StaticResource Display}" FontSize="20" Foreground="{StaticResource Witch}"/>
+                            <TextBlock x:Name="LyricsSource" Foreground="{StaticResource Fog}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <ToggleButton x:Name="TbTranslations" Style="{StaticResource ToggleIcon}" Width="34" Height="34" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold"
+                                          Content="文A" ToolTip="Show translations (some sources add a Chinese line under each lyric)" Click="Translations_Click"/>
+                            <Button Style="{StaticResource IconBtn}" Width="34" Height="34" FontSize="14" Content="&#xE738;" ToolTip="Lyrics 0.5 s earlier ( [ )" Click="OffsetEarlier_Click"/>
+                            <TextBlock x:Name="OffsetText" Foreground="{StaticResource Mist}" FontSize="11" VerticalAlignment="Center" MinWidth="30" TextAlignment="Center"/>
+                            <Button Style="{StaticResource IconBtn}" Width="34" Height="34" FontSize="14" Content="&#xE710;" ToolTip="Lyrics 0.5 s later ( ] )" Click="OffsetLater_Click"/>
+                            <Button x:Name="BtnSources" Style="{StaticResource IconBtn}" Width="34" Height="34" FontSize="14" Content="&#xE8FD;" ToolTip="Other sources" Click="Sources_Click"/>
+                            <Button Style="{StaticResource IconBtn}" Width="34" Height="34" FontSize="14" Content="&#xE72C;" ToolTip="Search online again" Click="LyricsRefresh_Click"/>
+                            <Button x:Name="BtnSaveLyrics" Style="{StaticResource IconBtn}" Width="34" Height="34" FontSize="14" Content="&#xE74E;" ToolTip="Save these lyrics into the file" Click="LyricsSave_Click"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        <ScrollViewer x:Name="LyricsScroll" VerticalScrollBarVisibility="Auto" PanningMode="VerticalOnly" PreviewMouseWheel="LyricsScroll_Wheel">
+                            <ItemsControl x:Name="LyricsItems" ItemTemplate="{StaticResource LyricRow}" Margin="24,0,24,0"/>
+                        </ScrollViewer>
+                        <Border Height="46" VerticalAlignment="Top" IsHitTestVisible="False">
+                            <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#F0150C21" Offset="0"/><GradientStop Color="#00150C21" Offset="1"/></LinearGradientBrush></Border.Background>
+                        </Border>
+                        <Border Height="46" VerticalAlignment="Bottom" IsHitTestVisible="False">
+                            <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#00150C21" Offset="0"/><GradientStop Color="#F0150C21" Offset="1"/></LinearGradientBrush></Border.Background>
+                        </Border>
+                        <StackPanel x:Name="LyricsState" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" Margin="20">
+                            <local:Sprite x:Name="LyricsStateSprite" Id="ghost" Height="70" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="LyricsStateText" Foreground="{StaticResource Mist}" FontSize="14" TextAlignment="Center" TextWrapping="Wrap" Margin="0,12,0,0" MaxWidth="320"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- transport -->
+        <Border Grid.Row="2" Background="#E60B0612" BorderBrush="{StaticResource Edge}" BorderThickness="0,1,0,0" Padding="18,8">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="220"/><ColumnDefinition Width="2.4*"/><ColumnDefinition Width="*" MinWidth="200"/></Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border x:Name="MiniCover" Width="56" Height="56" CornerRadius="10" Background="{StaticResource Crypt2}" BorderBrush="{StaticResource Edge}" BorderThickness="1"/>
+                    <StackPanel VerticalAlignment="Center" Margin="12,0,0,0">
+                        <TextBlock x:Name="MiniTitle" Foreground="{StaticResource Bone}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+                        <TextBlock x:Name="MiniArtist" Foreground="{StaticResource Mist}" FontSize="12" TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <ToggleButton x:Name="BtnShuffle" Style="{StaticResource ToggleIcon}" Content="&#xE8B1;" ToolTip="Shuffle" Click="Shuffle_Click"/>
+                        <Button Style="{StaticResource IconBtn}" Content="&#xE892;" ToolTip="Previous" Click="Prev_Click" Margin="6,0"/>
+                        <Button x:Name="BtnPlay" Style="{StaticResource PlayBtn}" Content="&#xE768;" Click="PlayPause_Click"/>
+                        <Button Style="{StaticResource IconBtn}" Content="&#xE893;" ToolTip="Next" Click="Next_Click" Margin="6,0"/>
+                        <ToggleButton x:Name="BtnRepeat" Style="{StaticResource ToggleIcon}" Content="&#xE8EE;" ToolTip="Repeat: off" Click="Repeat_Click"/>
+                    </StackPanel>
+                    <Grid Margin="0,2,0,0">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="46"/><ColumnDefinition Width="*"/><ColumnDefinition Width="46"/></Grid.ColumnDefinitions>
+                        <TextBlock x:Name="TimeNow" Text="0:00" Foreground="{StaticResource Mist}" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,8,0"/>
+                        <Slider x:Name="SeekBar" Grid.Column="1" Style="{StaticResource Seek}" Minimum="0" Maximum="1" VerticalAlignment="Center"
+                                PreviewMouseLeftButtonDown="Seek_Down" PreviewMouseLeftButtonUp="Seek_Up" ValueChanged="Seek_ValueChanged"/>
+                        <TextBlock x:Name="TimeTotal" Grid.Column="2" Text="0:00" Foreground="{StaticResource Mist}" FontSize="12" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button x:Name="BtnMute" Style="{StaticResource IconBtn}" Content="&#xE767;" Click="Mute_Click"/>
+                    <Slider x:Name="VolumeBar" Style="{StaticResource Seek}" Width="120" Minimum="0" Maximum="1" Value="0.8" ValueChanged="Volume_Changed" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- overlays -->
+        <Border x:Name="ToastBox" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,18" Background="#F01F1230" BorderBrush="{StaticResource Pumpkin}"
+                BorderThickness="1" CornerRadius="12" Padding="16,9" Opacity="0" IsHitTestVisible="False">
+            <TextBlock x:Name="ToastText" Foreground="{StaticResource Bone}" FontSize="13"/>
+        </Border>
+
+        <Border x:Name="DropOverlay" Grid.RowSpan="3" Background="#D90B0612" Visibility="Collapsed" IsHitTestVisible="False">
+            <Border Margin="40" BorderBrush="{StaticResource Pumpkin}" BorderThickness="2" CornerRadius="26">
+                <Border.Background><SolidColorBrush Color="#22FF7A18"/></Border.Background>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <local:Sprite Id="cauldron" Height="110" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="DropText" Text="Drop to add to the queue" FontFamily="{StaticResource Display}" FontSize="40" Foreground="{StaticResource Pumpkin}" HorizontalAlignment="Center" Margin="0,16,0,4"/>
+                    <TextBlock Text="Files, folders or playlists  ·  hold Ctrl to replace the queue" Foreground="{StaticResource Mist}" FontSize="14" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</Window>
